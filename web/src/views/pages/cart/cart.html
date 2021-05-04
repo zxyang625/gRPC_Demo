@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>购物车</title>
+<link type="text/css" rel="stylesheet" href="/static/css/style.css" >
+<script src="/static/script/jquery-1.7.2.js"></script>
+<script>
+	$(function(){
+		//给清空购物车的超链接绑定单击事件
+		$("#emptyCart").click(function(){
+			return confirm("亲！确定要清空购物车吗？三思啊！~~~~(>_<)~~~~");
+		});
+		//给删除购物项的超链接绑定单击事件
+		$(".deleteCartItem").click(function(){
+			//获取图书的名称
+			var title = $(this).attr("id");
+			return confirm("确定要删除【"+title+"】这本图书吗？");
+		});
+		//给输入购物项数量的input绑定change事件
+		$(".updateCartItem").change(function(){
+			//获取购物项的id
+			var cartItemId = $(this).attr("id");
+			//获取用户输入的图书的数量
+			var bookCount = $(this).val();
+			//发送请求
+			// location = "/updateCartItem?cartItemId="+cartItemId+"&bookCount="+bookCount;
+			//设置请求的url
+			var url = "/updateCartItem";
+			//设置请求参数
+			var params = {"cartItemId":cartItemId,"bookCount":bookCount};
+			//获取显示购物项中的金额小计的td元素
+			var $tdEle = $(this).parent().next().next();
+			//发送Ajax请求
+			$.post(url,params,function(res){
+				//设置总数量
+				$("#totalCount").text(res.TotalCount);
+				//设置总金额
+				$("#totalAmount").text(res.TotalAmount);
+				//设置金额小计
+				$tdEle.text(res.Amount);
+			},"json");
+		});
+	});
+</script>
+</head>
+<body>
+	
+	<div id="header">
+			<img class="logo_img" alt="" src="/static/img/logo.gif" >
+			<span class="wel_word">购物车</span>
+			{{if .UserID}}
+			<div>
+				<span>欢迎<span class="um_span">{{.UserName}}</span>光临尚硅谷书城</span>
+				<a href="/getCartInfo">购物车</a>
+				<a href="/getMyOrder">我的订单</a>
+				<a href="/logout">注销</a>&nbsp;&nbsp;
+				<a href="/main">返回</a>
+			</div>
+			{{else}}
+			<div>
+				<a href="pages/user/login.html">登录</a> | 
+				<a href="pages/user/regist.html">注册</a> &nbsp;&nbsp;
+				<a href="/pages/manager/manager.html">后台管理</a>
+				<a href="/getOrders">订单管理</a>
+			</div>
+			{{end}}
+	</div>
+	
+	<div id="main">
+		
+		{{if .Cart}}
+		<table>
+			<tr>
+				<td>商品名称</td>
+				<td>数量</td>
+				<td>单价</td>
+				<td>金额</td>
+				<td>操作</td>
+			</tr>
+		{{range .Cart.CartItems}}	
+			<tr>
+				<td>{{.Book.Title}}</td>
+				<td>
+					<input id="{{.CartItemID}}" class="updateCartItem" type="number" min="1" value="{{.Count}}" style="text-align:center;width: 50px;"/>
+				</td>
+				<td>{{.Book.Price}}</td>
+				<td>{{.Amount}}</td>
+				<td><a id="{{.Book.Title}}" class="deleteCartItem" href="/deleteCartItem?cartItemId={{.CartItemID}}">删除</a></td>
+			</tr>
+		{{end}}
+		</table>
+		
+		<div class="cart_info">
+			<span class="cart_span">购物车中共有<span class="b_count" id="totalCount">{{.Cart.TotalCount}}</span>件商品</span>
+			<span class="cart_span">总金额<span class="b_price" id="totalAmount">{{.Cart.TotalAmount}}</span>元</span>
+			<span class="cart_span"><a href="/main">继续购物</a></span>
+			<span class="cart_span"><a href="/deleteCart?cartId={{.Cart.CartID}}" id="emptyCart">清空购物车</a></span>
+			<span class="cart_span"><a href="/checkout">去结账</a></span>
+		</div>
+		{{else}}
+		<br/><br/><br/><br/><br/><br/><br/><br/><br/>
+		<h1 style="text-align: center">您的购物车饥渴难耐，快去<a href="/main" style="color:red">购物</a>吧！</h1>
+		{{end}}
+	</div>
+	
+	<div id="bottom">
+		<span>
+			尚硅谷书城.Copyright &copy;2015
+		</span>
+	</div>
+</body>
+</html>
