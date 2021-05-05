@@ -29,3 +29,14 @@ func SaveUser(username string, password string, email string) error {
 	}
 	return nil
 }
+
+//CheckUserNameAndPassword 根据用户名和密码从数据库中查询一条记录
+func CheckUserNameAndPassword(username string, password string) (*model.User, error) {
+	//写sql语句
+	sqlStr := "select id,username,password,email from users where username = ? and password = ?"
+	//执行
+	row := utils.Db.QueryRow(sqlStr, username, password)
+	user := &model.User{}
+	row.Scan(&user.ID, &user.Username, &user.Password, &user.Email)
+	return user, nil
+}
