@@ -26,17 +26,7 @@ func GetBooks() ([]*model.Book, error) {
 	return books, nil
 }
 
-//AddBook 向数据库中添加一本图书
-func AddBook(b *model.Book) error {
-	//写sql语句
-	slqStr := "insert into books(title,author,price,sales,stock,img_path) values(?,?,?,?,?,?)"
-	//执行
-	_, err := utils.Db.Exec(slqStr, b.Title, b.Author, b.Price, b.Sales, b.Stock, b.ImgPath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+
 
 //DeleteBook 根据图书的id从数据库中删除一本图书
 func DeleteBook(bookID string) error {
@@ -44,6 +34,18 @@ func DeleteBook(bookID string) error {
 	sqlStr := "delete from books where id = ?"
 	//执行
 	_, err := utils.Db.Exec(sqlStr, bookID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//AddBook 向数据库中添加一本图书
+func AddBook(b *model.Book) error {
+	//写sql语句
+	slqStr := "insert into books(title,author,price,sales,stock,img_path) values(?,?,?,?,?,?)"
+	//执行
+	_, err := utils.Db.Exec(slqStr, b.Title, b.Author, b.Price, b.Sales, b.Stock, b.ImgPath)
 	if err != nil {
 		return err
 	}
