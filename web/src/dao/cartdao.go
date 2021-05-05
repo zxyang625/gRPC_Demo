@@ -5,24 +5,7 @@ import (
 	"utils"
 )
 
-//AddCart 向购物车表中插入购物车
-func AddCart(cart *model.Cart) error {
-	//写sql语句
-	sqlStr := "insert into carts(id,total_count,total_amount,user_id) values(?,?,?,?)"
-	//执行sql
-	_, err := utils.Db.Exec(sqlStr, cart.CartID, cart.GetTotalCount(), cart.GetTotalAmount(), cart.UserID)
-	if err != nil {
-		return err
-	}
-	//获取购物车中的所有购物项
-	cartItems := cart.CartItems
-	//遍历得到每一个购物项
-	for _, cartItem := range cartItems {
-		//将购物项插入到数据库中
-		AddCartItem(cartItem)
-	}
-	return nil
-}
+
 
 //GetCartByUserID 根据用户的id从数据库中查询对应的购物车
 func GetCartByUserID(userID int) (*model.Cart, error) {
@@ -68,6 +51,25 @@ func DeleteCartByCartID(cartID string) error {
 	_, err2 := utils.Db.Exec(sql, cartID)
 	if err2 != nil {
 		return err2
+	}
+	return nil
+}
+
+//AddCart 向购物车表中插入购物车
+func AddCart(cart *model.Cart) error {
+	//写sql语句
+	sqlStr := "insert into carts(id,total_count,total_amount,user_id) values(?,?,?,?)"
+	//执行sql
+	_, err := utils.Db.Exec(sqlStr, cart.CartID, cart.GetTotalCount(), cart.GetTotalAmount(), cart.UserID)
+	if err != nil {
+		return err
+	}
+	//获取购物车中的所有购物项
+	cartItems := cart.CartItems
+	//遍历得到每一个购物项
+	for _, cartItem := range cartItems {
+		//将购物项插入到数据库中
+		AddCartItem(cartItem)
 	}
 	return nil
 }
