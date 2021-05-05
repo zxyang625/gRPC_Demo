@@ -30,6 +30,25 @@ func DeleteSession(sessID string) error {
 	return nil
 }
 
+//IsLogin 判断用户是否已经登录 false 没有登录 true 已经登录
+func IsLogin(r *http.Request) (bool, *model.Session) {
+	//根据Cookie的name获取Cookie
+	cookie, _ := r.Cookie("user")
+	if cookie != nil {
+		//获取Cookie的value
+		cookieValue := cookie.Value
+		//根据cookieValue去数据库中查询与之对应的Session
+		session, _ := GetSession(cookieValue)
+		if session.UserID > 0 {
+			//已经登录
+			return true, session
+		}
+	}
+	//没有登录
+	return false, nil
+}
+
+
 //GetSession 根据session的Id值从数据库中查询Session
 func GetSession(sessID string) (*model.Session, error) {
 	//写sql语句
@@ -48,20 +67,3 @@ func GetSession(sessID string) (*model.Session, error) {
 	return sess, nil
 }
 
-//IsLogin 判断用户是否已经登录 false 没有登录 true 已经登录
-func IsLogin(r *http.Request) (bool, *model.Session) {
-	//根据Cookie的name获取Cookie
-	cookie, _ := r.Cookie("user")
-	if cookie != nil {
-		//获取Cookie的value
-		cookieValue := cookie.Value
-		//根据cookieValue去数据库中查询与之对应的Session
-		session, _ := GetSession(cookieValue)
-		if session.UserID > 0 {
-			//已经登录
-			return true, session
-		}
-	}
-	//没有登录
-	return false, nil
-}
