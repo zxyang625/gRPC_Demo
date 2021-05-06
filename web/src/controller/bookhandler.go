@@ -111,15 +111,6 @@ func GetPageBooks(w http.ResponseWriter, r *http.Request) {
 // 	GetBooks(w, r)
 // }
 
-//DeleteBook 删除图书
-func DeleteBook(w http.ResponseWriter, r *http.Request) {
-	//获取要删除的图书的id
-	bookID := r.FormValue("bookId")
-	//调用bookdao中删除图书的函数
-	dao.DeleteBook(bookID)
-	//调用GetBooks处理器函数再次查询一次数据库
-	GetPageBooks(w, r)
-}
 
 //ToUpdateBookPage 去更新或者添加图书的页面
 func ToUpdateBookPage(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +131,16 @@ func ToUpdateBookPage(w http.ResponseWriter, r *http.Request) {
 		//执行
 		t.Execute(w, "")
 	}
+}
+
+//DeleteBook 删除图书
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+	//获取要删除的图书的id
+	bookID := r.FormValue("bookId")
+	//调用bookdao中删除图书的函数
+	dao.DeleteBook(bookID)
+	//调用GetBooks处理器函数再次查询一次数据库
+	GetPageBooks(w, r)
 }
 
 //UpdateOrAddBook 更新或添加图书
