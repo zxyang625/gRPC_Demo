@@ -70,6 +70,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//CheckUserName 通过发送Ajax验证用户名是否可用
+func CheckUserName(w http.ResponseWriter, r *http.Request) {
+	//获取用户输入的用户名
+	username := r.PostFormValue("username")
+	//调用userdao中验证用户名和密码的方法
+	user, _ := dao.CheckUserName(username)
+	if user.ID > 0 {
+		//用户名已存在
+		w.Write([]byte("用户名已存在！"))
+	} else {
+		//用户名可用
+		w.Write([]byte("<font style='color:green'>用户名可用！</font>"))
+	}
+}
+
 //Regist 处理用户的函注册数
 func Regist(w http.ResponseWriter, r *http.Request) {
 	//获取用户名和密码
@@ -91,17 +106,4 @@ func Regist(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//CheckUserName 通过发送Ajax验证用户名是否可用
-func CheckUserName(w http.ResponseWriter, r *http.Request) {
-	//获取用户输入的用户名
-	username := r.PostFormValue("username")
-	//调用userdao中验证用户名和密码的方法
-	user, _ := dao.CheckUserName(username)
-	if user.ID > 0 {
-		//用户名已存在
-		w.Write([]byte("用户名已存在！"))
-	} else {
-		//用户名可用
-		w.Write([]byte("<font style='color:green'>用户名可用！</font>"))
-	}
-}
+
