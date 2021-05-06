@@ -88,21 +88,7 @@ func GetOrderInfo(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, orderItems)
 }
 
-//GetMyOrders 获取我的订单
-func GetMyOrders(w http.ResponseWriter, r *http.Request) {
-	//获取session
-	_, session := dao.IsLogin(r)
-	//获取用户的id
-	userID := session.UserID
-	//调用dao中获取用户的所有订单的函数
-	orders, _ := dao.GetMyOrders(userID)
-	//将订单设置到session中
-	session.Orders = orders
-	//解析模板
-	t := template.Must(template.ParseFiles("views/pages/order/order.html"))
-	//执行
-	t.Execute(w, session)
-}
+
 
 //SendOrder 发货
 func SendOrder(w http.ResponseWriter, r *http.Request) {
@@ -122,4 +108,20 @@ func TakeOrder(w http.ResponseWriter, r *http.Request) {
 	dao.UpdateOrderState(orderID, 2)
 	//调用获取我的订单的函数再次查询我的订单
 	GetMyOrders(w, r)
+}
+
+//GetMyOrders 获取我的订单
+func GetMyOrders(w http.ResponseWriter, r *http.Request) {
+	//获取session
+	_, session := dao.IsLogin(r)
+	//获取用户的id
+	userID := session.UserID
+	//调用dao中获取用户的所有订单的函数
+	orders, _ := dao.GetMyOrders(userID)
+	//将订单设置到session中
+	session.Orders = orders
+	//解析模板
+	t := template.Must(template.ParseFiles("views/pages/order/order.html"))
+	//执行
+	t.Execute(w, session)
 }
