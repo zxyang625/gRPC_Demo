@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+
 //CreateUUID 生成UUID
 func CreateUUID() (uuid string) {
 	u := new([16]byte)
