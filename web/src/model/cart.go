@@ -9,6 +9,7 @@ type Cart struct {
 	UserID      int         //当前购物车所属的用户
 }
 
+
 //GetTotalCount 获取购物车中图书的总数量
 func (cart *Cart) GetTotalCount() int64 {
 	var totalCount int64
@@ -18,6 +19,7 @@ func (cart *Cart) GetTotalCount() int64 {
 	}
 	return totalCount
 }
+
 
 //GetTotalAmount 获取购物车中图书的总金额
 func (cart *Cart) GetTotalAmount() float64 {
