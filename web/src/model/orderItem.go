@@ -1,5 +1,6 @@
 package model
 
+
 //OrderItem 结构
 type OrderItem struct {
 	OrderItemID int64   //订单项的id
