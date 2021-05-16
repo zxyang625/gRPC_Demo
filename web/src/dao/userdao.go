@@ -21,7 +21,7 @@ func CheckUserName(username string) (*model.User, error) {
 //SaveUser 向数据库中插入用户信息
 func SaveUser(username string, password string, email string) error {
 	//写sql语句
-	sqlStr := "insert into users(username,password,email) values(?,?,?)"
+	sqlStr := "insert into users(username,MD5(password),email) values(?,?,?)"
 	//执行
 	_, err := utils.Db.Exec(sqlStr, username, password, email)
 	if err != nil {
