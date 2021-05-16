@@ -21,7 +21,7 @@ func main() {
 	//通过Ajax请求验证用户名是否可用
 	http.HandleFunc("/checkUserName", controller.CheckUserName)
 	//获取所有图书
-	// http.HandleFunc("/getBooks", controller.GetBooks)
+	http.HandleFunc("/getBooks", controller.GetBooks)
 	//获取带分页的图书信息
 	http.HandleFunc("/getPageBooks", controller.GetPageBooks)
 	http.HandleFunc("/getPageBooksByPrice", controller.GetPageBooksByPrice)
