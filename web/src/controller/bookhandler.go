@@ -8,20 +8,20 @@ import (
 	"strconv"
 )
 
-// IndexHandler 去首页
-// func IndexHandler(w http.ResponseWriter, r *http.Request) {
-// 	//获取页码
-// 	pageNo := r.FormValue("pageNo")
-// 	if pageNo == "" {
-// 		pageNo = "1"
-// 	}
-// 	//调用bookdao中获取带分页的图书的函数
-// 	page, _ := dao.GetPageBooks(pageNo)
-// 	//解析模板
-// 	t := template.Must(template.ParseFiles("views/index.html"))
-// 	//执行
-// 	t.Execute(w, page)
-// }
+//IndexHandler 去首页
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	//获取页码
+	pageNo := r.FormValue("pageNo")
+	if pageNo == "" {
+		pageNo = "1"
+	}
+	//调用bookdao中获取带分页的图书的函数
+	page, _ := dao.GetPageBooks(pageNo)
+	//解析模板
+	t := template.Must(template.ParseFiles("views/index.html"))
+	//执行
+	t.Execute(w, page)
+}
 
 //GetPageBooksByPrice 获取带分页和价格范围的图书
 func GetPageBooksByPrice(w http.ResponseWriter, r *http.Request) {
