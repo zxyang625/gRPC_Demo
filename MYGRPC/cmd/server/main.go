@@ -21,6 +21,9 @@ func main() {
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
 	grpcServer := grpc.NewServer()
 	pb.RegisterLaptopServiceServer(grpcServer, laptopServer)
+	//gRPC 反射, 然后可以通过evans测试grpc请求
+	//调用reflection.Register(grpcServer)
+	//reflection.Register(grpcServer)
 
 	address := fmt.Sprintf("0.0.0.0:%d", *port)
 	listener, err := net.Listen("tcp", address)
