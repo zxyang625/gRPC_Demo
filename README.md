@@ -48,7 +48,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->          
+>             
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -98,4 +98,55 @@
 >    `subjectAltName=DNS:*.study.com,DNS:*.study.org,IP:127.0.0.1`
 >
 >    这是因为如果IP不对应server地址或者缺少IP，会导致TLS无法验证证书而握手失败。而在实际生产中是可以忽略IP的，因为可以改用域名。
+
+- <h4>在gRPC中使用nginx</h4>
+
+> nginx支持HTTP2.0，因此可以在gRPC中使用。[nginx](http://nginx.org/en/download.html)中各版本的区别:
+>
+> Mainline version：Nginx 目前主力在做的版本，可以认为是主线版本、开发版
+> Stable version：最新的稳定版，生产环境上建议使用这个版本
+> Legacy versions：稳定版的历史版本集合
+>
+> **需要注意的是:nginx的版本号并不是数字越大版本越高**，例如[nginx-1.8.1]已经是相当老旧的版本了，最新的版本是1.20.0。
+>
+> **nginx对HTTP2的支持需要在conf/nginx.conf修改配置,例如我在conf文件夹下新建了cert文件夹用于存放.pem文件**，以下是我的配置:
+>
+>     worker_processes  1;
+>     error_log  logs/error.log;
+>     
+>     events {
+>         worker_connections  10;
+>     }
+>     
+>     http {
+>     access_log  logs/access.log;
+>     
+>     upstream pcbook_services {
+>     server 127.0.0.1:50051;
+>     server 127.0.0.1:50052;
+>     }
+>     
+>     server {
+>         listen       8080 ssl http2;
+>         #告诉nginx证书和密钥的位置
+>         ssl_certificate cert/server-cert.pem;
+>         ssl_certificate_key cert/server-key.pem;
+>         ssl_client_certificate cert/ca-cert.pem;
+>       
+>         ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
+>     
+>         location / {
+>     	grpc_pass grpc://pcbook_services;
+>         }
+>     }
+
+> 在Windows10 下使用Nginx可能会出现问题:
+>
+> `nginx: [emerg] BIO_new_file("./conf/cert/nginx.pem") failed (SSL: error:02001003:system library:fopen:No such process:fopen(’./conf/cert/nginx.pem’,‘r’) error:2006D080:BIO routines:BIO_new_file:no such file)`
+>
+> 这个问题的出现代表nginx配置文件中配置了ssl协议，但nginx确没有相应的证书文件。所以应当检查证书文件的路径是否正确，也可以考虑加入-c显式指定配置的conf路径:
+>
+> ```
+> start nginx -c ./conf/nginx.exe
+> ```
 
