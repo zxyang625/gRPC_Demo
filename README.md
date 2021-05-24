@@ -48,7 +48,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->             
+>                
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -75,17 +75,17 @@
 
 > 关于openssl命令以及证书生成的[参考资料](https://blog.csdn.net/qq_30145355/article/details/113279539)。
 >
-> ca-key.pem：CA的私钥
-> ca-cert.pem：CA的证书文件
-> ca-cert.srl：保存证书的唯一序列号
-> client-ext.cnf：客户端证书扩展信息。
-> client-req.pem：客户端的证书签名请求（CSR）文件
-> client-key.pem：客户端的私钥
-> client-cert.pem：客户端的证书
-> server-ext.cnf：服务器证书扩展信息
-> server-req.pem：服务器的证书签名请求（CSR）文件
-> server-key.pem：服务器的私钥
-> server-cert.pem：服务器的证书
+> ca-key.pem：CA的私钥  
+> ca-cert.pem：CA的证书文件  
+> ca-cert.srl：保存证书的唯一序列号  
+> client-ext.cnf：客户端证书扩展信息。  
+> client-req.pem：客户端的证书签名请求（CSR）文件  
+> client-key.pem：客户端的私钥  
+> client-cert.pem：客户端的证书  
+> server-ext.cnf：服务器证书扩展信息  
+> server-req.pem：服务器的证书签名请求（CSR）文件  
+> server-key.pem：服务器的私钥  
+> server-cert.pem：服务器的证书  
 
 > 关于openssl比较坑的地方:
 >
@@ -134,9 +134,9 @@
 >         ssl_client_certificate cert/ca-cert.pem;
 >       
 >         ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
->     
+>         
 >         location / {
->     	grpc_pass grpc://pcbook_services;
+>        grpc_pass grpc://pcbook_services;
 >         }
 >     }
 
