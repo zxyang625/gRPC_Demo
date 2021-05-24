@@ -18,4 +18,7 @@ test:
 evans:
 	evans -r -p 8080
 
-.PHONY: gen client server clean test
+cert:
+	cd cert; ./cert.sh
+
+.PHONY: gen client server clean test cert

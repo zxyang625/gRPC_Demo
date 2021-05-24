@@ -3,9 +3,11 @@ package main
 import (
 	"../../pb"
 	"../../service"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -45,6 +47,24 @@ func accessibleRoles() map[string][]string {
 	}
 }
 
+//加载TLS凭据,对于服务端需要加载服务器的证书和私钥,因此采用tls.LoadX509KeyPair函数
+//从cert文件夹加载server-cert.pem和server-key.pem文件
+//然后使用服务器证书制作一个tls配置对象
+//最后使用该凭据并返回给呼叫者
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	serverCert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	config := &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		ClientAuth: tls.NoClientCert,
+	}
+
+	return credentials.NewTLS(config), nil
+}
+
 func main() {
 	port := flag.Int("port", 0, "the server port")
 	flag.Parse()
@@ -64,8 +84,15 @@ func main() {
 	ratingStore := service.NewInMemoryRatingStore()
 	laptopServer := service.NewLaptopServer(laptopStore, imageStore, ratingStore)
 
+	//获取TLS凭据
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatal("cannot load TLS credentials: ", err)
+	}
+
 	interceptor := service.NewAuthInterceptor(jwtManager, accessibleRoles())
 	grpcServer := grpc.NewServer(
+		grpc.Creds(tlsCredentials),
 		grpc.UnaryInterceptor(interceptor.Unary()),
 		grpc.StreamInterceptor(interceptor.Stream()),
 		)

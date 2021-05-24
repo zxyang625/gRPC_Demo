@@ -48,7 +48,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->    
+>       
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -90,5 +90,12 @@
 > 关于openssl比较坑的地方:
 >
 > 1. openssl的二进制文件在原网址上移除了，而如果要自己配置会相当麻烦
+>
 > 2. 参照参考资料的配置方法，在Windows和Linux上运行时有个很大的坑。<u>由于Linux和Windows的文件路径分隔符是'/'和'\\'，因此在Windows上通过Git运行.sh会失败，解决方法是:将每个出现'/'命令的第一个‘/’改为"//"</u>。
+>
+> 3. <u>在localhost中使用自签证书时，server-cxt.cnf中必须要指定IP地址作为证书使用者备用名称(SAN)的扩展</u>，例如:
+>
+>    `subjectAltName=DNS:*.study.com,DNS:*.study.org,IP:127.0.0.1`
+>
+>    这是因为如果IP不对应server地址或者缺少IP，会导致TLS无法验证证书而握手失败。而在实际生产中是可以忽略IP的，因为可以改用域名。
 
