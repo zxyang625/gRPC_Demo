@@ -4,11 +4,13 @@ import (
 	"../../pb"
 	"../../service"
 	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
+	"io/ioutil"
 	"log"
 	"net"
 	"time"
@@ -52,6 +54,18 @@ func accessibleRoles() map[string][]string {
 //然后使用服务器证书制作一个tls配置对象
 //最后使用该凭据并返回给呼叫者
 func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	//以下代码为开启双向TLS所需，创建新的证书池
+	pemClientCA, err := ioutil.ReadFile("cert/ca-cert.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(pemClientCA) {
+		return nil, fmt.Errorf("failed to add client CA's certificate")
+	}
+	//
+
 	serverCert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
 	if err != nil {
 		return nil, err
@@ -59,7 +73,8 @@ func loadTLSCredentials() (credentials.TransportCredentials, error) {
 
 	config := &tls.Config{
 		Certificates: []tls.Certificate{serverCert},
-		ClientAuth: tls.NoClientCert,
+		ClientAuth: tls.RequireAndVerifyClientCert,	//这里开启双向TLS
+		ClientCAs: certPool,			//开启双向TLS还需要提供手信任的CA证书列表
 	}
 
 	return credentials.NewTLS(config), nil

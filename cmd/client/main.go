@@ -99,8 +99,15 @@ func loadTLSCredentials() (credentials.TransportCredentials, error) {
 		return nil, fmt.Errorf("failed to add server CA' s certificate")
 	}
 
+	//开启双向验证所需
+	clientCert, err := tls.LoadX509KeyPair("cert/client-cert.pem", "cert/client-key.pem")
+	if err != nil {
+		return nil, err
+	}
+	//
 	config := &tls.Config{
 		RootCAs: certPool,
+		Certificates: []tls.Certificate{clientCert},	//客户端TLS配置，也携带证书
 	}
 
 	return credentials.NewTLS(config), nil

@@ -19,7 +19,7 @@
 >    $ protoc --go_out=plugins=grpc:./go2/ ./proto/my.proto
 >    ```
 >
->    <u>当你运行之后会报错，说这种命令已经过时了，要用最新的命令运行</u>，像下面这样:
+>    **当你运行之后会报错，说这种命令已经过时了，要用最新的命令运行**，像下面这样:
 >
 >    ```sh
 >    $ protoc --go_out=. --go_opt=paths=source_relative \
@@ -27,7 +27,7 @@
 >        helloworld/helloworld.proto
 >    ```
 >
->    但新命令完全不好使，而且网上能找到的教程大多都是使用旧命令，最新版不支持，<u>因此解决办法是不下载最新版的代码，在[https://github.com/protocolbuffers/protobuf-go](https://github.com/protocolbuffers/protobuf-go)使用以前的版本</u>，我自己用的是v1.4.0。
+>    但新命令完全不好使，而且网上能找到的教程大多都是使用旧命令，最新版不支持，**因此解决办法是不下载最新版的代码，在[https://github.com/protocolbuffers/protobuf-go](https://github.com/protocolbuffers/protobuf-go)使用以前的版本**，我自己用的是v1.4.0。
 >
 > 2. 关于gRPC库依赖下载
 >
@@ -48,7 +48,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->       
+>          
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -91,9 +91,9 @@
 >
 > 1. openssl的二进制文件在原网址上移除了，而如果要自己配置会相当麻烦
 >
-> 2. 参照参考资料的配置方法，在Windows和Linux上运行时有个很大的坑。<u>由于Linux和Windows的文件路径分隔符是'/'和'\\'，因此在Windows上通过Git运行.sh会失败，解决方法是:将每个出现'/'命令的第一个‘/’改为"//"</u>。
+> 2. 参照参考资料的配置方法，在Windows和Linux上运行时有个很大的坑。**由于Linux和Windows的文件路径分隔符是'/'和'\\'，因此在Windows上通过Git运行.sh会失败，解决方法是:将每个出现'/'命令的第一个‘/’改为"//"**。
 >
-> 3. <u>在localhost中使用自签证书时，server-cxt.cnf中必须要指定IP地址作为证书使用者备用名称(SAN)的扩展</u>，例如:
+> 3. **在localhost中使用自签证书时，server-ext.cnf和client-ext.cnf中必须要指定IP地址作为证书使用者备用名称(SAN)的扩展**，例如:
 >
 >    `subjectAltName=DNS:*.study.com,DNS:*.study.org,IP:127.0.0.1`
 >
