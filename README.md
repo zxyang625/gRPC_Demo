@@ -242,5 +242,5 @@
 
 > 如何实现从REST到gRPC的转换?
 >
-> 通过**RegisterXXXServiceHandleServer()**函数实现从REST到gRPC的进程内转换，这样就不需要单独的gRPC服务器通过网络调用来服务REST发来的请求。不过此函数只支持Unary RPC，对于stream RPC，则需要使用**RegisterXXXServiceHandleFromEndpoint()**函数，这个函数将传入的RESTful请求转换为gRPC格式，并在指定的端口上调用相应的RPC。
+> 通过**RegisterXXXServiceHandleServer()** 函数实现从REST到gRPC的进程内转换，这样就不需要单独的gRPC服务器通过网络调用来服务REST发来的请求。不过此函数只支持Unary RPC，对于stream RPC，则需要使用**RegisterXXXServiceHandleFromEndpoint()** 函数，这个函数将传入的RESTful请求转换为gRPC格式，并在指定的端口上调用相应的RPC。
 
