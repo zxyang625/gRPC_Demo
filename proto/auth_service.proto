@@ -2,6 +2,8 @@ syntax = "proto3";
 option go_package="../pb;pb";
 package pb;
 
+import "google/api/annotations.proto";
+
 message LoginRequest {
   string username = 1;
   string password = 2;
@@ -12,5 +14,10 @@ message LoginResponse {
 }
 
 service AuthService {
-  rpc Login(LoginRequest) returns (LoginResponse) {};
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/login"
+      body : "*"
+    };
+  };
 }

@@ -48,7 +48,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->                
+>                      
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -103,44 +103,44 @@
 
 > nginx支持HTTP2.0，因此可以在gRPC中使用。[nginx](http://nginx.org/en/download.html)中各版本的区别:
 >
-> Mainline version：Nginx 目前主力在做的版本，可以认为是主线版本、开发版
-> Stable version：最新的稳定版，生产环境上建议使用这个版本
-> Legacy versions：稳定版的历史版本集合
+> Mainline version：Nginx 目前主力在做的版本，可以认为是主线版本、开发版  
+> Stable version：最新的稳定版，生产环境上建议使用这个版本  
+> Legacy versions：稳定版的历史版本集合  
 >
 > **需要注意的是:nginx的版本号并不是数字越大版本越高**，例如[nginx-1.8.1]已经是相当老旧的版本了，最新的版本是1.20.0。
 >
-> **nginx对HTTP2的支持需要在conf/nginx.conf修改配置,例如我在conf文件夹下新建了cert文件夹用于存放.pem文件**，以下是我的配置:
+> **nginx对HTTP2的支持需要在conf/nginx.conf修改配置,例如我在conf文件夹下新建了cert文件夹用于存放.pem文件**，以下是未开启TLS时的配置:
 >
->     worker_processes  1;
->     error_log  logs/error.log;
+>      worker_processes  1;
+>      error_log  logs/error.log;
 >     
->     events {
->         worker_connections  10;
->     }
+>      events {
+>          worker_connections  10;
+>      }
 >     
->     http {
->     access_log  logs/access.log;
+>      http {
+>      access_log  logs/access.log;
 >     
->     upstream pcbook_services {
->     server 127.0.0.1:50051;
->     server 127.0.0.1:50052;
->     }
+>      upstream pcbook_services {
+>      server 127.0.0.1:50051;
+>      server 127.0.0.1:50052;
+>      }
 >     
->     server {
->         listen       8080 ssl http2;
->         #告诉nginx证书和密钥的位置
->         ssl_certificate cert/server-cert.pem;
->         ssl_certificate_key cert/server-key.pem;
->         ssl_client_certificate cert/ca-cert.pem;
->       
->         ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
->         
->         location / {
->        grpc_pass grpc://pcbook_services;
->         }
->     }
+>      server {
+>          listen       8080 ssl http2;
+>          #告诉nginx证书和密钥的位置
+>          ssl_certificate cert/server-cert.pem;
+>          ssl_certificate_key cert/server-key.pem;
+>          ssl_client_certificate cert/ca-cert.pem;
+>      ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
+>     
+>      location / {
+>     	grpc_pass grpc://pcbook_services;
+>      }
+>  }
 
-> 在Windows10 下使用Nginx可能会出现问题:
+> 1. 在Windows10 下使用Nginx可能会出现问题:
+>
 >
 > `nginx: [emerg] BIO_new_file("./conf/cert/nginx.pem") failed (SSL: error:02001003:system library:fopen:No such process:fopen(’./conf/cert/nginx.pem’,‘r’) error:2006D080:BIO routines:BIO_new_file:no such file)`
 >
@@ -149,4 +149,43 @@
 > ```
 > start nginx -c ./conf/nginx.exe
 > ```
+
+> 2. 此外，**如果在服务器和客户端之间启用了TLS连接，那么在加入nginx之后启动客户端发送请求肯定是会失败的。因为尽管nginx和客户端的TLS握手成功，但是nginx和后端服务器的TLS握手仍会失败，这是由于服务端想启用TLS连接，但是nginx向服务器的发起的连接使用的仍然是不安全的连接。**解决办法如下:
+>    1. 只启用服务端TLS
+>
+>       1) 在nginx.conf中将grpc方案修改为grpcs:
+>
+>    ```
+>    location / {
+>     	grpc_pass grpcs://pcbook_services;	#启用TLS需要将grpc改为grpcs
+>      }
+>    ```
+>
+>    ​		2) 修改server.go中代码，设置config的ClientAuth字段为 `tls.NoClientCert`
+>
+>    **注意:这个方法在只使用服务端TLS的时候才有效。**
+>
+>    2. 启用双向TLS
+>
+>       1) 在nginx.conf中将grpc方案修改为grpcs:
+>
+>    ```
+>    location / {
+>     	grpc_pass grpcs://pcbook_services;	#启用TLS需要将grpc改为grpcs
+>      }
+>    ```
+>
+>    ​	   2) 在nginx.conf中指定服务器证书的位置:
+>
+>    ```
+>     location / {
+>    	grpc_pass grpcs://pcbook_services; 	#启用TLS需要将grpc改为grpcs
+>    	
+>    	#双向TLS需要指定nginx发送给上游服务器的证书的位置
+>    	grpc_ssl_certificate cert/server-cert.pem;
+>    	grpc_ssl_certificate_key cert/server-key.pem;
+>     }
+>    ```
+>
+>    **提示:实际上应该也为nginx生成另一对证书和密钥，以满足nginx和服务器之间的TLS，这里我简单使用已有的证书和密钥。**
 
