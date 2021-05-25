@@ -1,5 +1,28 @@
 # gRPC Demo
 
+<h2>项目说明</h2>
+
+这是学习gRPC而实现的一个Demo，这个Demo的主要功能就是通过gRPC实现对笔记本电脑参数的创建，储存，评分等功能。期间陆陆续续完善例如实现四种gRPC调用，通过evans测试gRPC请求，通过JWT实现拦截器和身份验证，通过Openssl生成自签证书完成双向TLS验证，采用nginx实现负载均衡以及配置gRPC-Gateway来实现REST到gRPC的转换。
+
+├─.idea
+├─cert						//存放证书以及密钥		
+├─client					 //用户登录以及验证令牌
+├─cmd
+│  ├─client				 //客户端发送请求
+│  └─server			   //服务器响应请求
+├─pb						  //编译的.pb.go文件
+├─proto					 //proto文件
+│  └─google			   //谷歌http.api批注
+│      ├─api
+│      └─rpc
+├─sample				   //实例生成
+├─serializer				//序列化和反序列化
+├─service					//gRPC服务
+├─swagger				 //swagger反射json文件
+└─tmp						 //临时文件
+
+
+
 <h2>细数gRPC中的坑(持续更新)</h2>
 
 - <h4>protobuf这个包到底在哪?github.com/protobuf? github.com/protocolbuffers/protobuf?  google.golang.org/protobuf?</h4>
@@ -48,7 +71,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->                      
+>                            
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -107,46 +130,46 @@
 > Stable version：最新的稳定版，生产环境上建议使用这个版本  
 > Legacy versions：稳定版的历史版本集合  
 >
-> **需要注意的是:nginx的版本号并不是数字越大版本越高**，例如[nginx-1.8.1]已经是相当老旧的版本了，最新的版本是1.20.0。
+> **需要注意的是:nginx的版本号并不是数字越大版本越高**，例如[nginx-1.8.1]已经是相当老旧的版本了，使用老版本是跑步起来的，我自己用的是1.20.0。
 >
 > **nginx对HTTP2的支持需要在conf/nginx.conf修改配置,例如我在conf文件夹下新建了cert文件夹用于存放.pem文件**，以下是未开启TLS时的配置:
 >
->      worker_processes  1;
->      error_log  logs/error.log;
->     
->      events {
->          worker_connections  10;
->      }
->     
->      http {
->      access_log  logs/access.log;
->     
->      upstream pcbook_services {
->      server 127.0.0.1:50051;
->      server 127.0.0.1:50052;
->      }
->     
->      server {
->          listen       8080 ssl http2;
->          #告诉nginx证书和密钥的位置
->          ssl_certificate cert/server-cert.pem;
->          ssl_certificate_key cert/server-key.pem;
->          ssl_client_certificate cert/ca-cert.pem;
->      ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
->     
->      location / {
->     	grpc_pass grpc://pcbook_services;
->      }
->  }
+> ```
+>  worker_processes  1;
+>   error_log  logs/error.log;
+> 
+>   events {
+>       worker_connections  10;
+>   }
+> 
+>   http {
+>   access_log  logs/access.log;
+> 
+>   upstream pcbook_services {
+>   server 127.0.0.1:50051;
+>   server 127.0.0.1:50052;
+>   }
+> 
+>   server {
+>       listen       8080 ssl http2;
+>       #告诉nginx证书和密钥的位置
+>       ssl_certificate cert/server-cert.pem;
+>       ssl_certificate_key cert/server-key.pem;
+>       ssl_client_certificate cert/ca-cert.pem;
+>   ssl_verify_client on;   #开启告诉nginx验证客户端发送证书的真实性
+> 
+>   location / {
+>  	grpc_pass grpc://pcbook_services;
+>   }
+> ```
 
 > 1. 在Windows10 下使用Nginx可能会出现问题:
 >
->
-> `nginx: [emerg] BIO_new_file("./conf/cert/nginx.pem") failed (SSL: error:02001003:system library:fopen:No such process:fopen(’./conf/cert/nginx.pem’,‘r’) error:2006D080:BIO routines:BIO_new_file:no such file)`
->
-> 这个问题的出现代表nginx配置文件中配置了ssl协议，但nginx确没有相应的证书文件。所以应当检查证书文件的路径是否正确，也可以考虑加入-c显式指定配置的conf路径:
->
-> ```
+>`nginx: [emerg] BIO_new_file("./conf/cert/nginx.pem") failed (SSL: error:02001003:system library:fopen:No such process:fopen(’./conf/cert/nginx.pem’,‘r’) error:2006D080:BIO routines:BIO_new_file:no such file)`
+> 
+>这个问题的出现代表nginx配置文件中配置了ssl协议，但nginx确没有相应的证书文件。所以应当检查证书文件的路径是否正确，也可以考虑加入 -c 显式指定配置的conf路径:
+> 
+>```
 > start nginx -c ./conf/nginx.exe
 > ```
 
@@ -180,7 +203,7 @@
 >    ```
 >     location / {
 >    	grpc_pass grpcs://pcbook_services; 	#启用TLS需要将grpc改为grpcs
->    	
+>       
 >    	#双向TLS需要指定nginx发送给上游服务器的证书的位置
 >    	grpc_ssl_certificate cert/server-cert.pem;
 >    	grpc_ssl_certificate_key cert/server-key.pem;
@@ -188,4 +211,36 @@
 >    ```
 >
 >    **提示:实际上应该也为nginx生成另一对证书和密钥，以满足nginx和服务器之间的TLS，这里我简单使用已有的证书和密钥。**
+
+- <h4>关于grpc-gateway的使用</h4>
+
+> [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)是protoc的一个插件。它能读取gRPC服务定义，并生成一个反向代理服务器，将RESTFUL JSON API转换为gRPC。举例来说，假定我们有一个项目需求，希望**用RPC作为内部API的通讯**，同时也**想对外提供Restful API**，写两套又太繁琐不符合，于是可以利用gRPC以及gRPC Gateway。
+
+> gRPC-Gateway的坑点在于其配置过程，很多资料由于年代久远，未能及时更新gRPC-Gateway的版本迭代，再加上官方文档写的属实过于偷懒，因此配置过程中出现错误也很正常。
+>
+> **首先需要说明的是，最新版gRPC-Gateway v2不再支持GOPATH，只支持GO MOD!**
+>
+> 所以如果采用GOPATH管理package的话必然会遇到如下错误:
+>
+> ```
+> cannot find package "github.com/grpc-ecosystem/grpc-gateway/v2/utilities" in any of:
+>  E:\Golang\Go\src\github.com\grpc-ecosystem\grpc-gateway\v2\utilities (from $GOROOT)
+>  C:\Users\Lenovo\go\src\github.com\grpc-ecosystem\grpc-gateway\v2\utilities (from $GOPATH)
+> 
+> ```
+>
+> 解决办法是要么就采用GO MOD管理package，要么继续使用v1的最新版[v1.15.1](https://github.com/grpc-ecosystem/grpc-gateway/releases/tag/v1.15.1)，不过v1版本已经停止更新了,**在使用v1版本时要注意其他包和工具的版本，不然出现以下警告是必然的**:
+>
+> ```
+> WARNING: Package "github.com/golang/protobuf/protoc-gen-go/generator" is deprecated.
+>      A future release of golang/protobuf will delete this package,
+>      which has long been excluded from the compatibility promise.
+> 
+> ```
+>
+> 排除这个坑之后，按照官方文档的方法来就没有问题了。不过有些命令也已经改变了，详情可以参考[gRPC-Gateway v2](https://grpc-ecosystem.github.io/grpc-gateway/docs/development/grpc-gateway_v2_migration_guide/)关于新版和旧版的区别。
+
+> 如何实现从REST到gRPC的转换?
+>
+> 通过**RegisterXXXServiceHandleServer()**函数实现从REST到gRPC的进程内转换，这样就不需要单独的gRPC服务器通过网络调用来服务REST发来的请求。不过此函数只支持Unary RPC，对于stream RPC，则需要使用**RegisterXXXServiceHandleFromEndpoint()**函数，这个函数将传入的RESTful请求转换为gRPC格式，并在指定的端口上调用相应的RPC。
 

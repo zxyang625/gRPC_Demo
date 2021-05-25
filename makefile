@@ -19,6 +19,9 @@ server1-tls:
 server2-tls:
 	go run cmd/server/main.go -port 50052 -tls
 
+rest:
+	go run cmd/server/main.go -port 8081 -type rest -endpoint 127.0.0.1:8080
+
 client:
 	go run cmd/client/main.go -address 127.0.0.1:8080
 
