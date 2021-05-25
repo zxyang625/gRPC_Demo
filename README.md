@@ -4,22 +4,22 @@
 
 这是学习gRPC而实现的一个Demo，这个Demo的主要功能就是通过gRPC实现对笔记本电脑参数的创建，储存，评分等功能。期间陆陆续续完善例如实现四种gRPC调用，通过evans测试gRPC请求，通过JWT实现拦截器和身份验证，通过Openssl生成自签证书完成双向TLS验证，采用nginx实现负载均衡以及配置gRPC-Gateway来实现REST到gRPC的转换。
 
-├─.idea
-├─cert						//存放证书以及密钥		
-├─client					 //用户登录以及验证令牌
-├─cmd
-│  ├─client				 //客户端发送请求
-│  └─server			   //服务器响应请求
-├─pb						  //编译的.pb.go文件
-├─proto					 //proto文件
-│  └─google			   //谷歌http.api批注
-│      ├─api
-│      └─rpc
-├─sample				   //实例生成
-├─serializer				//序列化和反序列化
-├─service					//gRPC服务
-├─swagger				 //swagger反射json文件
-└─tmp						 //临时文件
+├─.idea  
+├─cert						//存放证书以及密钥	    	  
+├─client					 //用户登录以及验证令牌  
+├─cmd  
+│  ├─client				 //客户端发送请求  
+│  └─server			   //服务器响应请求  
+├─pb						  //编译的.pb.go文件  
+├─proto					 //proto文件  
+│  └─google			   //谷歌http.api批注  
+│      ├─api  
+│      └─rpc  
+├─sample				   //实例生成  
+├─serializer				//序列化和反序列化  
+├─service					//gRPC服务  
+├─swagger				 //swagger反射json文件  
+└─tmp						 //临时文件    
 
 
 
@@ -71,7 +71,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->                            
+>                               
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -203,7 +203,7 @@
 >    ```
 >     location / {
 >    	grpc_pass grpcs://pcbook_services; 	#启用TLS需要将grpc改为grpcs
->       
+>          
 >    	#双向TLS需要指定nginx发送给上游服务器的证书的位置
 >    	grpc_ssl_certificate cert/server-cert.pem;
 >    	grpc_ssl_certificate_key cert/server-key.pem;
