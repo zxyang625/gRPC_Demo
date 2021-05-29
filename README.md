@@ -4,6 +4,14 @@
 
 这是学习gRPC而实现的一个Demo，这个Demo的主要功能就是通过gRPC实现对笔记本电脑参数的创建，储存，评分等功能。期间陆陆续续完善例如实现四种gRPC调用，通过evans测试gRPC请求，通过JWT实现拦截器和身份验证，通过Openssl生成自签证书完成双向TLS验证，采用nginx实现负载均衡以及配置gRPC-Gateway来实现REST到gRPC的转换。
 
+branch main: 主要功能实现，没有添加双向TLS
+
+branch interceptor: 实现了双向TLS
+
+branch restful: 使用nginx负载均衡，同时使用了grpc-Gateway
+
+
+
 ├─.idea  
 ├─cert						//存放证书以及密钥	    	  
 ├─client					 //用户登录以及验证令牌  
@@ -71,7 +79,7 @@
 >    go get -u github.com/golang/protobuf/proto
 >    go get -u github.com/golang/protobuf/proto/protoc-gen-go} 
 >    git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto  
->                               
+>                                  
 >    cd $GOPATH/src/  
 >    go install google.golang.org/grpc 
 >    ```
@@ -203,7 +211,7 @@
 >    ```
 >     location / {
 >    	grpc_pass grpcs://pcbook_services; 	#启用TLS需要将grpc改为grpcs
->          
+>             
 >    	#双向TLS需要指定nginx发送给上游服务器的证书的位置
 >    	grpc_ssl_certificate cert/server-cert.pem;
 >    	grpc_ssl_certificate_key cert/server-key.pem;
