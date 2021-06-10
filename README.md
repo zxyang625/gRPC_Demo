@@ -58,7 +58,8 @@ branch restful: 使用nginx负载均衡，同时使用了grpc-Gateway
 >        helloworld/helloworld.proto
 >    ```
 >
->    但新命令完全不好使，而且网上能找到的教程大多都是使用旧命令，最新版不支持，**因此解决办法是不下载最新版的代码，在[https://github.com/protocolbuffers/protobuf-go](https://github.com/protocolbuffers/protobuf-go)使用以前的版本**，我自己用的是v1.4.0。
+>    但新命令完全不好使，而且网上能找到的教程大多都是使用旧命令，最新版不支持，**因此解决办法是不下载最新版的代码，在[https://github.com/protocolbuffers/protobuf-go](https://github.com/protocolbuffers/protobuf-go)使用以前的版本**，我自己用的是v3.17.0。
+>    **GO MOD模式下配置就会简单很多，推荐使用GO MOD**
 >
 > 2. 关于gRPC库依赖下载
 >
@@ -99,7 +100,9 @@ branch restful: 使用nginx负载均衡，同时使用了grpc-Gateway
 >
 > 然后就可以在cmd中输入一下命令开启evans了(假设端口为8080,默认端口为50051):
 >
-> `$ evans -r -p 8080`
+> `$ evans -r -p 8080`  
+> 
+> **有一个需要注意的点是:即便是go_package中可以指定package名，但是如果不显示指定package名, 那么evans中输入show packages还是空的，但是show services还是可以正确运行的。**
 
 - <h4>关于使用openssl生成自签证书</h4>
 
